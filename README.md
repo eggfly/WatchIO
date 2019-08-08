@@ -1,8 +1,10 @@
 # WatchIO
 
-[原理图Schematic_esp8285-watch.pdf](Schematic_esp8285-watch.pdf)
+WatchIO 是源自我多年前的一个DIY智能手表的梦想，就是给爱好者们提供一款体积小巧的可联网可编程的彩屏手表。
 
-不多说，上图
+它基于乐鑫ESP32模组，支持Wi-Fi和蓝牙通信，仅有1.5个5角硬币大小，兼容Arduino和MicroPython，资源丰富。USB串口、锂电池和充电电路，可以让很多可穿戴的创意实现。内置的BMP280气压温度传感器、6轴运动传感器MPU6050给手表提供了更多的应用场景。
+
+上图
 ![img](images/1.jpg)
 ![img](images/intro.jpg)
 

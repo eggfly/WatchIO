@@ -8,31 +8,57 @@
 #define TFT_DC        27 // Display data/command select
 #define TFT_BACKLIGHT  15 // Display backlight pin
 
+#define SWITCH_UP  12
+#define SWITCH_DOWN  9
+#define SWITCH_PUSH  13
+#define BTN  0
+
+int sensorPin = 32;    // select the input pin for the potentiometer
+int sensorValue = 0;  // variable to store the value coming from the sensor
 
 // For 1.44" and 1.8" TFT with ST7735 (including HalloWing) use:
 Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
 
+static boolean sw_up_active = false;
+static boolean sw_down_active = false;
+static boolean sw_push_active = false;
+static boolean btn_active = false;
+
+static int brightness = 240;
 
 float p = 3.1415926;
+
+void sw_up() {
+  sw_up_active = true;
+}
+void sw_down() {
+  sw_down_active = true;
+}
+void sw_push() {
+  sw_push_active = true;
+}
+void btn() {
+  btn_active = true;
+}
 
 void setup(void) {
   Serial.begin(115200);
   Serial.print(F("Hello! ST77xx TFT Test"));
 
-  pinMode(TFT_RST, OUTPUT);
+  pinMode(SWITCH_UP, INPUT);
+  pinMode(SWITCH_DOWN, INPUT);
+  pinMode(SWITCH_PUSH, INPUT);
+  pinMode(BTN, INPUT);
+  attachInterrupt(SWITCH_UP, sw_up, FALLING);
+  attachInterrupt(SWITCH_DOWN, sw_down, FALLING);
+  attachInterrupt(SWITCH_PUSH, sw_push, FALLING);
+  attachInterrupt(BTN, btn, FALLING);
 
-  digitalWrite(TFT_RST, HIGH);
-  delay(5);
-  digitalWrite(TFT_RST, LOW);
-  delay(20);
-  digitalWrite(TFT_RST, HIGH);
-  delay(20);
-  digitalWrite(TFT_RST, LOW);
-
+  // setup pwm channel
   ledcSetup(0, 5000, 8);
   ledcAttachPin(TFT_BACKLIGHT, 0);
   // low is backlight on
-  ledcWrite(0, 250);
+  ledcWrite(0, brightness);
 
   // use this initializer (uncomment) if using a 0.96" 180x60 TFT:
   tft.initR(INITR_MINI160x80);  // Init ST7735S mini display
@@ -117,11 +143,49 @@ void setup(void) {
 }
 
 void loop() {
-  tft.invertDisplay(true);
+  Serial.println("loop");
+  tft.fillScreen(ST77XX_YELLOW);
+
+  sensorValue = analogRead(sensorPin);
+  double voltage =  sensorValue / 4096.0 * 3.3 * 4.0 / 3.0 * 1.084;
+
+  tft.setCursor(10, 10);
+  tft.setTextColor(ST77XX_RED);
+  tft.setTextWrap(true);
+
+  tft.println(sensorValue);
+  tft.print(" batt=");
+  tft.print(voltage);
+  tft.print("V");
+  tft.println();
+
+  if (btn_active) {
+    btn_active = false;
+    tft.println("btn clicked, reboot now!");
+    delay(2000);
+    ESP.restart();
+  } else if (sw_up_active) {
+    sw_up_active = false;
+    brightness -= 32;
+    if (brightness <= 0) {
+      brightness = 0;
+    }
+    ledcWrite(0, brightness);
+    tft.println("increase brightness");
+    tft.print(" brightness=");
+    tft.println(brightness);
+  } else if (sw_down_active) {
+    sw_down_active = false;
+    brightness += 32;
+    if (brightness >= 255) {
+      brightness = 255;
+    }
+    ledcWrite(0, brightness);
+    tft.println("decrease brightness");
+    tft.print(" brightness=");
+    tft.println(brightness);
+  }
   delay(500);
-  tft.invertDisplay(false);
-  delay(500);
-  Serial.println("loop??");
 }
 
 void testlines(uint16_t color) {

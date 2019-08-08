@@ -50,7 +50,7 @@ Note: [Arduino源码在src目录](src/)
 
 |  Device   | I<sup>2</sup>C address  | Arduino Library | Notes |
 |  ----  | ----  |  ----  | ----  |
-|  RTC  | 0x51  | https://github.com/adafruit/RTClib | PCF8563  |
+|  RTC  | 0x51  | https://github.com/NeiroNx/RTCLib | PCF8563  |
 | MPU6050  | 0x68 | https://github.com/tockn/MPU6050_tockn | |
 | BMP280  | 0x76 | https://github.com/adafruit/Adafruit_BMP280_Library | 初始化时需指定0x76地址：bmp.begin(BMP280_ADDRESS_ALT) |
 

@@ -48,7 +48,7 @@ Note: [Arduino源码在src目录](src/)
 
 # I<sup>2</sup>C device addresses
 
-|  Device   | I<sup>2</sup>C addresse  | Arduino Library | Notes |
+|  Device   | I<sup>2</sup>C address  | Arduino Library | Notes |
 |  ----  | ----  |  ----  | ----  |
 |  RTC  | 0x51  | https://github.com/adafruit/RTClib | PCF8563  |
 | MPU6050  | 0x68 | https://github.com/tockn/MPU6050_tockn | |

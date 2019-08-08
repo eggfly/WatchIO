@@ -32,12 +32,10 @@ void setup(void) {
   ledcSetup(0, 5000, 8);
   ledcAttachPin(TFT_BACKLIGHT, 0);
   // low is backlight on
-  ledcWrite(0, 192 + 16);
+  ledcWrite(0, 250);
 
   // use this initializer (uncomment) if using a 0.96" 180x60 TFT:
   tft.initR(INITR_MINI160x80);  // Init ST7735S mini display
-  // pinMode(TFT_BACKLIGHT, OUTPUT);
-  // digitalWrite(TFT_BACKLIGHT, LOW); // Backlight on
 
   // hack is a need
   tft.invertDisplay(true);

@@ -23,14 +23,32 @@
 
 # ESP32 GPIO pins
 
-|  GPIO   | Peripheral  |
-|  ----  | ----  |
-| GPIO0  | 单元格 |
-| GPIO1  | 单元格 |
+|  GPIO   | Peripheral  | Notes |
+|  ----  | ----  |  ----  |
+| GPIO0  | 侧按开关 | Pulled Up, 按下可以在启动时作为flash开关 |
+| GPIO12  | 多功能开关Pin1 | Pulled Up |
+| GPIO9  | 多功能开关Pin2 | Pulled Up |
+| GPIO13  | 多功能开关 按下 | Pulled Up |
+| GPIO4  | MPU6050 Interrupt |  |
+| GPIO32  | VBAT_SENSOR | 电池电压ADC检测，使用100K和300K电阻分压后给GPIO，GPIO电压是VBAT的四分之三 |
+| GPIO33  | TFT_RESET |  |
+| GPIO27 | TFT_DC | aka TFT_RS |
+| GPIO14 | TFT_CS | |
+| GPIO15 | TFT_BACKLIGHT | P-MOS管TFT背光控制，默认上拉不亮，低电平点亮 |
+| GPIO23 | TFT_SDA | ESP32 full speed SPI(VSPI) |
+| GPIO18 | TFT_SCL | ESP32 full speed SPI(VSPI) |
+| GPIO22 | SCL | ESP32 hardware I<sup>2</sup>C |
+| GPIO21 | SDA | ESP32 hardware I<sup>2</sup>C |
+
+# I<sup>2</sup>C device addresses
+
+- RTC:
+- MPU6050:
+- BMP280:
 
 # 备注
 
-- 出厂默认设置忽略了MTDI的stapping pin, 强制烧了efuse配置flash SDIO_VCC是3.3V 命令: espefuse.py set_flash_voltage 3.3V
+- 出厂默认设置忽略了MTDI的strapping pin, 强制烧了efuse配置flash SDIO_VCC是3.3V，这样可以释放出一个GPIO12。命令: espefuse.py set_flash_voltage 3.3V 参考 https://blog.csdn.net/u010631857/article/details/78323512 和 https://github.com/espressif/esptool/wiki/espefuse
  
 # 更多图片
 

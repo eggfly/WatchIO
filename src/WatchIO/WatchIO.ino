@@ -18,7 +18,6 @@
 #define BTN              0
 
 int sensorPin = 32;    // select the input pin for the potentiometer
-int sensorValue = 0;  // variable to store the value coming from the sensor
 
 // For 1.44" and 1.8" TFT with ST7735 (including HalloWing) use:
 Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
@@ -31,6 +30,7 @@ static boolean sw_down_active = false;
 static boolean sw_push_active = false;
 static boolean btn_active = false;
 
+static const float vbat_levels[] = {4.13, 4.06, 3.98, 3.92, 3.87, 3.82, 3.79, 3.77, 3.74, 3.68, 3.45, 3.00};
 
 const int brightness_max = 255;
 const int brightness_delta = brightness_max / 10;
@@ -38,6 +38,50 @@ const int brightness_delta = brightness_max / 10;
 static int brightness = brightness_max - brightness_delta;
 
 float p = 3.1415926;
+
+
+float getBatteryLevel(float voltage) {
+  float level = 1;
+  if (voltage >= vbat_levels[0]) {
+    level = 1;
+  } else if (voltage >= vbat_levels[1]) {
+    level = 0.9;
+    level += 0.1 * (voltage - vbat_levels[1]) / (vbat_levels[0] - vbat_levels[1]);
+  } else if (voltage >= vbat_levels[2]) {
+    level = 0.8;
+    level += 0.1 * (voltage - vbat_levels[2]) / (vbat_levels[1] - vbat_levels[2]);
+  } else if (voltage >= vbat_levels[3]) {
+    level = 0.7;
+    level += 0.1 * (voltage - vbat_levels[3]) / (vbat_levels[2] - vbat_levels[3]);
+  } else if (voltage >= vbat_levels[4]) {
+    level = 0.6;
+    level += 0.1 * (voltage - vbat_levels[4]) / (vbat_levels[3] - vbat_levels[4]);
+  } else if (voltage >= vbat_levels[5]) {
+    level = 0.5;
+    level += 0.1 * (voltage - vbat_levels[5]) / (vbat_levels[4] - vbat_levels[5]);
+  } else if (voltage >= vbat_levels[6]) {
+    level = 0.4;
+    level += 0.1 * (voltage - vbat_levels[6]) / (vbat_levels[5] - vbat_levels[6]);
+  } else if (voltage >= vbat_levels[7]) {
+    level = 0.3;
+    level += 0.1 * (voltage - vbat_levels[7]) / (vbat_levels[6] - vbat_levels[7]);
+  } else if (voltage >= vbat_levels[8]) {
+    level = 0.2;
+    level += 0.1 * (voltage - vbat_levels[8]) / (vbat_levels[7] - vbat_levels[8]);
+  } else if (voltage >= vbat_levels[9]) {
+    level = 0.1;
+    level += 0.1 * (voltage - vbat_levels[9]) / (vbat_levels[8] - vbat_levels[9]);
+  } else if (voltage >= vbat_levels[10]) {
+    level = 0.05;
+    level += 0.05 * (voltage - vbat_levels[10]) / (vbat_levels[9] - vbat_levels[10]);
+  } else if (voltage >= vbat_levels[11]) {
+    level = 0.00;
+    level += 0.05 * (voltage - vbat_levels[11]) / (vbat_levels[10] - vbat_levels[11]);
+  } else {
+    level = 0.00;
+  }
+  return level;
+}
 
 void sw_up() {
   sw_up_active = true;
@@ -57,11 +101,42 @@ void btn() {
 
 bool bmp280_initialized = false;
 
+bool is_rtc_running() {
+  DateTime now = rtc.now();
+  return now.year() > 2010;
+}
+
+void checkBatteryLevelOrDeepSleep() {
+  double startVoltage = readBatteryVoltage();
+  float batteryLevel = getBatteryLevel(startVoltage);
+  bool startBatteryIsLow = false;
+  if (batteryLevel <= 0.05) {
+    startBatteryIsLow = true;
+    Serial.println(F("battery is very low!"));
+    Serial.print("battery level: ");
+    Serial.println(batteryLevel * 100, 1);
+  }
+  if (startBatteryIsLow) {
+    tft.fillScreen(ST77XX_RED);
+    tft.setCursor(0, 0);
+    tft.setTextColor(ST77XX_WHITE);
+    tft.setTextSize(2);
+    tft.print("Low Battery!");
+    delay(500);
+    tft.sendCommand(ST77XX_SLPIN);
+    Serial.println("sleep tft..");
+    delay(500);
+    Serial.println("now go to sleep..");
+    esp_deep_sleep_start();
+    Serial.println("this will be never printed.");
+  }
+}
+
 void setup(void) {
   Serial.begin(115200);
-  Serial.print(F("Hello! ST77xx TFT Test"));
+  Serial.println(F("Hello! WatchIO"));
 
-  // use this initializer (uncomment) if using a 0.96" 180x60 TFT:
+  // use this initializer, using a 0.96" 180x60 TFT:
   tft.initR(INITR_MINI160x80);  // Init ST7735S mini display
 
   // hack is a need
@@ -69,6 +144,14 @@ void setup(void) {
 
   // init color before backlight
   tft.fillScreen(ST77XX_BLUE);
+
+  // setup pwm channel
+  ledcSetup(0, 5000, 8);
+  ledcAttachPin(TFT_BACKLIGHT, 0);
+  // low is backlight on
+  ledcWrite(0, brightness);
+
+  checkBatteryLevelOrDeepSleep();
 
   pinMode(SWITCH_UP, INPUT);
   pinMode(SWITCH_DOWN, INPUT);
@@ -94,19 +177,14 @@ void setup(void) {
   }
 
   rtc.begin();
-  if (!rtc.isrunning()) {
+  if (!is_rtc_running()) {
     Serial.println("RTC is NOT running!");
     // following line sets the RTC to the date & time this sketch was compiled
-    // rtc.adjust(DateTime(__DATE__, __TIME__));
+    rtc.adjust(DateTime(__DATE__, __TIME__));
   }
 
   Serial.println(F("Initialized"));
 
-  // setup pwm channel
-  ledcSetup(0, 5000, 8);
-  ledcAttachPin(TFT_BACKLIGHT, 0);
-  // low is backlight on
-  ledcWrite(0, brightness);
 
   uint16_t time = millis();
   // tft.fillScreen(ST77XX_WHITE);
@@ -245,23 +323,31 @@ void print_time() {
   tft.println(buf);
 }
 
+double readBatteryVoltage() {
+  int sensorValue = analogRead(sensorPin);
+  double voltage = sensorValue / 4096.0 * 3.3 * 4.0 / 3.0 * 1.113;
+  return voltage;
+}
+
 void loop() {
   Serial.println("loop");
-  tft.fillScreen(ST77XX_YELLOW);
 
-  sensorValue = analogRead(sensorPin);
-  double voltage = sensorValue / 4096.0 * 3.3 * 4.0 / 3.0 * 1.113;
+  checkBatteryLevelOrDeepSleep();
+  tft.fillScreen(ST77XX_YELLOW);
 
   tft.setCursor(0, 0);
   tft.setTextColor(ST77XX_RED);
   tft.setTextWrap(true);
 
   print_time();
-
-  tft.println(sensorValue);
-  tft.print(" batt=");
+  double voltage = readBatteryVoltage();
+  tft.print("vbat=");
   tft.print(voltage);
   tft.print("V");
+  tft.print(", ");
+  float battery_percent = getBatteryLevel(voltage);
+  tft.print(battery_percent * 100, 1);
+  tft.print("%");
   tft.println();
 
   print_bmp280();

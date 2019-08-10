@@ -103,8 +103,7 @@ bool bmp280_initialized = false;
 
 bool is_rtc_running() {
   DateTime now = rtc.now();
-  uint16_t year = now.year();
-  return year > 2018 && year < 2070;
+  return now.year() > 2010;
 }
 
 void checkBatteryLevelOrDeepSleep() {

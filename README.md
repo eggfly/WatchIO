@@ -12,7 +12,8 @@ WatchIO 是源自我多年前的一个DIY智能手表的梦想，就是给爱好
 - ESP32 Arduino编译环境搭建视频教程: https://www.bilibili.com/video/av63204960/
 
 上图
-![img](images/1.jpg)
+
+![img](images/1.jpg){:height="75%" width="75%"}
 ![img](images/intro.jpg)
 
 

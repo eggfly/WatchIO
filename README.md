@@ -13,8 +13,9 @@ WatchIO 是源自我多年前的一个DIY智能手表的梦想，就是给爱好
 
 上图
 
-<div align="center"><img src="images/1.jpg" width="75%" height="75%" /></div>
 <div align="center"><img src="images/intro.jpg" width="75%" height="75%" /></div>
+
+<div align="center"><img src="images/1.jpg" width="75%" height="75%" /></div>
 
 
 # 介绍
@@ -65,8 +66,8 @@ WatchIO 是源自我多年前的一个DIY智能手表的梦想，就是给爱好
  
 # 更多图片
 
-![img](images/2.jpg)
-![img](images/3.jpg)
-![img](images/pcb.png)
-![img](images/front.png)
-![img](images/back.png)
+<div align="center"><img src="images/2.jpg" width="75%" height="75%" /></div>
+<div align="center"><img src="images/3.jpg" width="75%" height="75%" /></div>
+<div align="center"><img src="images/pcb.jpg" width="75%" height="75%" /></div>
+<div align="center"><img src="images/front.jpg" width="75%" height="75%" /></div>
+<div align="center"><img src="images/back.jpg" width="75%" height="75%" /></div>

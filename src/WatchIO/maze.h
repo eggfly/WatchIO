@@ -7,7 +7,7 @@
 // actually y
 #define maze_calibration_x     0
 // actually x
-#define maze_calibration_y  (-600)
+#define maze_calibration_y     0
 
 #define delta_t_ms             10
 #define acc_sensitivity        1

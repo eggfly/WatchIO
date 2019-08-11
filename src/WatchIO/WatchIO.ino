@@ -1,6 +1,5 @@
 
 #include "config.h"
-#include "app_nvs.h"
 #include "res.h"
 #include "imu.h"
 #include "power.h"
@@ -117,7 +116,6 @@ int current_page = PAGE_CLOCK;
 int cursorX, cursorY;
 int clicked_cursor_x = -1, clicked_cursor_y = -1;
 
-
 void draw_cursor() {
   int times = 1;
   int average_accX = 0, average_accY = 0;
@@ -142,7 +140,7 @@ void draw_cursor() {
     cursorY = 79;
   }
   // draw cursor
-  canvas.fillCircle(cursorX, cursorY, 1, ST77XX_WHITE);
+  canvas.fillCircle(cursorX, cursorY, 2, ST77XX_RED);
 }
 
 
@@ -479,7 +477,7 @@ void loop() {
       _3d_inited = true;
     }
     page_3d();
-    delay(2);
+    delay(20);
   } else if (current_page == PAGE_MAZE) {
     page_maze();
   } else if (current_page == PAGE_FLAPPY_BIRD) {
@@ -496,7 +494,7 @@ void loop() {
 
 unsigned long last_isr_time;
 
-#define ISR_DITHERING_TIME_MS   50
+#define ISR_DITHERING_TIME_MS   250
 
 // 中断函数
 void home_isr() {
@@ -527,7 +525,7 @@ void old_button_isr() {
   feed_battery_warning();
   last_isr_time = millis();
   if (current_page == PAGE_KEYBOARD) {
-    Serial.printf("cursorX=%d, cursorY=%d\r\n", cursorX, cursorY);
+    // Serial.printf("cursorX=%d, cursorY=%d\r\n", cursorX, cursorY);
     clicked_cursor_x = cursorX;
     clicked_cursor_y = cursorY;
   } else {

@@ -33,8 +33,8 @@ void read_imu(int16_t *accX, int16_t *accY) {
     imu_timer = millis();
   }
   // reverse x and y, this is a hack
-  *accX = -1800 * mpu6050.getAccY();
-  *accY = -1800 * mpu6050.getAccX();
+  *accX = -3000 * mpu6050.getAccY();
+  *accY = -3000 * mpu6050.getAccX();
   // Serial.printf("%ld,%ld\r\n", *accX, *accY);
 }
 

@@ -20,7 +20,7 @@ Adafruit_ST7735 canvas = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
 const int brightness_max = 255;
 const int brightness_delta = brightness_max / 20;
 
-static int backlight = brightness_max - brightness_delta;
+static int backlight = 254;
 
 static bool ledc_setup = false;
 void lcd_init() {

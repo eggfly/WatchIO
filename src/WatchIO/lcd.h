@@ -20,14 +20,21 @@ Adafruit_ST7735 canvas = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
 const int brightness_max = 255;
 const int brightness_delta = brightness_max / 20;
 
-static int backlight = 254;
+static int backlight = 246;
 
 static bool ledc_setup = false;
 void lcd_init() {
   canvas.initR(INITR_MINI160x80);  // Init ST7735S mini display
   canvas.invertDisplay(true);
+  
+  canvas.setRotation(1);
+  
   canvas.fillScreen(ST77XX_BLUE);
-
+  canvas.setCursor(20, 30);
+  canvas.setTextSize(2);
+  canvas.setTextColor(ST77XX_WHITE);
+  canvas.print("loading...");
+  canvas.setTextSize(1);
   // setup pwm channel
   ledcSetup(0, 5000, 8);
   ledcAttachPin(TFT_BACKLIGHT, 0);
@@ -35,8 +42,6 @@ void lcd_init() {
 
   // low is backlight on
   ledcWrite(0, backlight);
-
-  canvas.setRotation(1);
 }
 
 void lcd_set_brightness(uint8_t brightness) {

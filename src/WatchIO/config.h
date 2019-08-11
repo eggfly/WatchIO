@@ -12,8 +12,6 @@
 #define SWITCH_DOWN  12
 #define SWITCH_PUSH  13
 
-#define GAME_BUTTON SWITCH_DOWN
-
 #define VBAT_SENSOR  32
 
 

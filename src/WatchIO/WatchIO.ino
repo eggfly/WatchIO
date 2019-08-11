@@ -96,7 +96,7 @@ void setup(void) {
   //attachInterrupt(digitalPinToInterrupt(SWITCH_DOWN), sw_down_isr, FALLING);
   attachInterrupt(digitalPinToInterrupt(SWITCH_PUSH), sw_push_isr, FALLING);
 
-  // mpu_init();
+  imu_init();
 }
 
 long loopTime, startTime, endTime, fps;
@@ -397,7 +397,7 @@ void page_game_old() {
   if (digitalRead(BUTTON_HOME) == 0) {
     // Serial.println("button 1 is down");
     game_button1_pressed();
-  } else if (digitalRead(GAME_BUTTON) == 0) {
+  } else if (digitalRead(SWITCH_UP) == 0) {
     // Serial.println("button 2 is down");
     game_button2_pressed();
   } else {

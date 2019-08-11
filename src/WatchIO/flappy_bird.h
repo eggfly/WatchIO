@@ -94,9 +94,15 @@ static short tmpx, tmpy;
 // faster drawPixel method by inlining calls and using setAddrWindow and pushColor
 // using macro to force inlining
 // #define drawPixel(a, b, c) M5.Lcd.setAddrWindow(a, b, a, b); M5.Lcd.pushColor(c)
+
+bool game_button_active() {
+  return digitalRead(SWITCH_DOWN) == LOW || digitalRead(SWITCH_UP) == LOW;
+}
+
 // ---------------
 // game loop
 // ---------------
+
 void game_loop() {
   // ===============
   // prepare game variables
@@ -130,7 +136,7 @@ void game_loop() {
   while (1) {
     loops = 0;
     while ( millis() > next_game_tick && loops < MAX_FRAMESKIP) {
-      if (digitalRead(GAME_BUTTON) == LOW) {
+      if (game_button_active()) {
         if (bird.y > BIRDH2 * 0.5) bird.vel_y = -JUMP_FORCE;
         // else zero velocity
         else bird.vel_y = 0;
@@ -305,8 +311,8 @@ void game_start() {
   canvas.println("please press side button");
   while (1) {
     // wait for push button
-    if (digitalRead(GAME_BUTTON) == LOW) {
-      while (digitalRead(GAME_BUTTON) == LOW);
+    if (game_button_active()) {
+      while (game_button_active());
       break;
     }
   }
@@ -356,8 +362,8 @@ void game_over() {
   while (1) {
     check_battery_warning_and_escape();
     // wait for push button
-    if (digitalRead(GAME_BUTTON) == LOW) {
-      while (digitalRead(GAME_BUTTON) == LOW);
+    if (game_button_active()) {
+      while (game_button_active());
       break;
     }
   }

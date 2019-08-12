@@ -1,6 +1,9 @@
 # WatchIO Arduino环境搭建和固件编译
+
 -1. 下载本github项目的最新版本zip包(git clone也可以)
+
 0. 下载Arduino: http://www.arduino.cc
+
 1. 输入官方esp32的board的json的地址
 <div align="center"><img src="arduino_images/arduino1.png" width="75%" height="75%" /></div>
 2. 进入开发板管理器

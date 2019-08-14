@@ -1,7 +1,7 @@
 #ifndef _BMP280_H_
 #define _BMP280_H_
 
-#include <Adafruit_BMP280.h>
+#include "src/Adafruit_BMP280_Library/Adafruit_BMP280.h"
 
 Adafruit_BMP280 bmp; // I2C
 bool bmp280_initialized = false;

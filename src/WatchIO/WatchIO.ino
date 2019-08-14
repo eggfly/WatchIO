@@ -2,6 +2,7 @@
 #include "config.h"
 #include "res.h"
 #include "imu.h"
+#include "bmp280.h"
 #include "power.h"
 #include "battery.h"
 #include "lcd.h"
@@ -97,6 +98,7 @@ void setup(void) {
   attachInterrupt(digitalPinToInterrupt(SWITCH_PUSH), sw_push_isr, FALLING);
 
   imu_init();
+  bmp280_init();
 }
 
 long loopTime, startTime, endTime, fps;
@@ -180,6 +182,27 @@ void draw_level() {
   }
   canvas.drawCircle(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, r, ST77XX_RED);
   canvas.fillCircle(cursorX, cursorY, 4, ST77XX_GREEN);
+}
+
+void draw_bmp280() {
+  read_bmp280();
+
+  canvas.setCursor(0, 2);
+  canvas.setTextColor(ST77XX_ORANGE);
+
+  canvas.print(F(""));
+  canvas.print(bmp280_temperature, 0);
+  // canvas.drawCircle(13, 2, 2,ST77XX_WHITE);
+  canvas.drawPixel(11, 0, ST77XX_ORANGE);
+  canvas.print("C ");
+
+  canvas.print(F(""));
+  canvas.print(bmp280_altitude); /* Adjusted to local forecast! */
+  canvas.print("m ");
+
+  canvas.print(F(""));
+  canvas.print(bmp280_pressure / 1000, 2);
+  canvas.print("kPa ");
 }
 
 void draw_menu() {
@@ -448,7 +471,7 @@ void loop() {
   check_update_battery();
   // check_lcd_brightness_change();
   if (current_page == PAGE_CLOCK || current_page == PAGE_TIMER) {
-    draw_menu();
+    draw_bmp280();
     page_1_2();
     // draw_cursor();
     draw_battery_percent();
@@ -458,7 +481,7 @@ void loop() {
       delay(100);
     }
   } else if (current_page == PAGE_KEYBOARD) {
-    draw_menu();
+    draw_bmp280();
     page_keyboard();
     draw_cursor();
     draw_battery_percent();

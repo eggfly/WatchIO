@@ -9,9 +9,7 @@ WatchIO 是源自我多年前的一个DIY智能手表的梦想，就是给爱好
 上图!
 
 <div align="center"><img src="images/intro.jpg" width="75%" height="75%" /></div>
-
 <div align="center"><img src="images/1.jpg" width="75%" height="75%" /></div>
-
 
 # 介绍
 
@@ -27,9 +25,9 @@ WatchIO 是源自我多年前的一个DIY智能手表的梦想，就是给爱好
 - 侧边按钮&多功能按钮（上中下多功能按钮）
 - 120mAh Li-Po电池（内置电压ADC检测&充放电电路）
 
-# Arduino固件编译教程
+# 文档
 
-- [点击查看Arduino固件编译教程](Arduino.md)
+- 文档和Arduino固件编译教程: [点击查看 /docs.md](docs.md)
 
 - Note: [Arduino源码在src目录](src/)
 - 固件演示视频: https://www.bilibili.com/video/av63202850/
@@ -37,42 +35,11 @@ WatchIO 是源自我多年前的一个DIY智能手表的梦想，就是给爱好
 
 # 注意事项
 
-- 开关机在侧面的拨动开关，拨到下面是开机，拨到上面是关机（锂电池的正极和PCB之间成为断开）
-- 如上，如果插入USB给锂电池充电，需要把拨动开关拨到下面，才能正常充进去电，否则仅为USB给ESP32供电
-- 锂电池充电管理IC是TP4057，充电电流配置为400mA，所以充电时间大概是10-20分钟左右，充满后自动停止充电
-
-# ESP32 GPIO pins
-
-|  GPIO   | Peripheral  | Notes |
-|  ----  | ----  |  ----  |
-| GPIO0  | 侧按开关 | Pulled Up, 按下可以在启动时作为flash开关 |
-| GPIO12  | 多功能开关Pin1 | Pulled Up |
-| GPIO9  | 多功能开关Pin2 | Pulled Up |
-| GPIO13  | 多功能开关 按下 | Pulled Up |
-| GPIO4  | MPU6050 Interrupt |  |
-| GPIO32  | VBAT_SENSOR | 电池电压ADC检测，使用100K和300K电阻分压后给GPIO，GPIO电压是VBAT的四分之三 |
-| GPIO33  | TFT_RESET |  |
-| GPIO27 | TFT_DC | aka TFT_RS |
-| GPIO14 | TFT_CS | |
-| GPIO15 | TFT_BACKLIGHT | P-MOS管TFT背光控制，默认上拉不亮，低电平点亮 |
-| GPIO23 | TFT_SDA | ESP32 full speed SPI(VSPI) |
-| GPIO18 | TFT_SCL | ESP32 full speed SPI(VSPI) |
-| GPIO22 | SCL | ESP32 hardware I<sup>2</sup>C |
-| GPIO21 | SDA | ESP32 hardware I<sup>2</sup>C |
-
-# I<sup>2</sup>C device addresses
-
-|  Device   | I<sup>2</sup>C address  | Arduino Library | Notes |
-|  ----  | ----  |  ----  | ----  |
-|  RTC  | 0x51  | https://github.com/NeiroNx/RTCLib | PCF8563  |
-| MPU6050  | 0x68 | https://github.com/tockn/MPU6050_tockn | |
-| BMP280  | 0x76 | https://github.com/adafruit/Adafruit_BMP280_Library | 初始化时需指定0x76地址：bmp.begin(BMP280_ADDRESS_ALT) |
+- 开关机在侧面的拨动开关，**拨到下面是开机，拨到上面是关机**（锂电池的正极和PCB之间成为断开）
+- 如上，如果插入USB给锂电池充电，**需要把拨动开关拨到下面**，才能正常充进去电，否则仅为USB给ESP32供电
+- 锂电池充电管理IC是TP4057，充电电流配置为400mA，充电时间大概10-20分钟左右，充满后自动停止充电
 
 
-# 备注
-
-- 出厂默认设置忽略了MTDI的strapping pin, 强制烧了efuse配置flash SDIO_VCC是3.3V，这样可以释放出一个GPIO12。命令: espefuse.py set_flash_voltage 3.3V 参考 https://blog.csdn.net/u010631857/article/details/78323512 和 https://github.com/espressif/esptool/wiki/espefuse
- 
 # 更多图片
 
 <div align="center"><img src="images/2.jpg" width="75%" height="75%" /></div>

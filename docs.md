@@ -14,7 +14,7 @@
 - **下载Arduino:** http://www.arduino.cc
 - 下载本github项目的最新版本zip包（git clone也可以）
 <div align="center"><img src="arduino_images/arduino0.png" width="50%" height="50%" /></div>
-- 在设置中输入官方esp32的board的json的地址: https://github.com/espressif/arduino-esp32/releases/download/package_esp32_index.json
+- 在设置中输入官方esp32的board的json的地址: https://dl.espressif.com/dl/package_esp32_index.json
 
 <div align="center"><img src="arduino_images/arduino1.png" width="50%" height="50%" /></div>
 - 进入开发板管理器

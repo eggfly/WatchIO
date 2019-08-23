@@ -14,6 +14,56 @@
 #define MPU6050_TEMP_H       0x41
 #define MPU6050_TEMP_L       0x42
 
+#ifndef BUFFER_LENGTH
+// band-aid fix for platforms without Wire-defined BUFFER_LENGTH (removed from some official implementations)
+#define BUFFER_LENGTH 32
+#endif
+
+#define MPU6050_RA_MOT_DETECT_CTRL      0x69
+#define MPU6050_DETECT_ACCEL_ON_DELAY_BIT       5
+#define MPU6050_DETECT_ACCEL_ON_DELAY_LENGTH    2
+
+
+#define MPU6050_RA_MOT_DUR          0x20
+
+#define MPU6050_RA_INT_PIN_CFG      0x37
+
+#define MPU6050_RA_INT_ENABLE       0x38
+
+#define MPU6050_RA_ACCEL_CONFIG     0x1C
+
+#define MPU6050_RA_MOT_THR          0x1F
+
+
+#define MPU6050_INTCFG_INT_LEVEL_BIT        7
+#define MPU6050_INTCFG_INT_OPEN_BIT         6
+#define MPU6050_INTCFG_LATCH_INT_EN_BIT     5
+#define MPU6050_INTCFG_INT_RD_CLEAR_BIT     4
+#define MPU6050_INTCFG_FSYNC_INT_LEVEL_BIT  3
+#define MPU6050_INTCFG_FSYNC_INT_EN_BIT     2
+#define MPU6050_INTCFG_I2C_BYPASS_EN_BIT    1
+#define MPU6050_INTCFG_CLKOUT_EN_BIT        0
+
+
+#define MPU6050_INTERRUPT_FF_BIT            7
+#define MPU6050_INTERRUPT_MOT_BIT           6
+#define MPU6050_INTERRUPT_ZMOT_BIT          5
+#define MPU6050_INTERRUPT_FIFO_OFLOW_BIT    4
+#define MPU6050_INTERRUPT_I2C_MST_INT_BIT   3
+#define MPU6050_INTERRUPT_PLL_RDY_INT_BIT   2
+#define MPU6050_INTERRUPT_DMP_INT_BIT       1
+#define MPU6050_INTERRUPT_DATA_RDY_BIT      0
+
+
+#define MPU6050_ACONFIG_XA_ST_BIT           7
+#define MPU6050_ACONFIG_YA_ST_BIT           6
+#define MPU6050_ACONFIG_ZA_ST_BIT           5
+#define MPU6050_ACONFIG_AFS_SEL_BIT         4
+#define MPU6050_ACONFIG_AFS_SEL_LENGTH      2
+#define MPU6050_ACONFIG_ACCEL_HPF_BIT       2
+#define MPU6050_ACONFIG_ACCEL_HPF_LENGTH    3
+
+
 class MPU6050{
   public:
 
@@ -55,6 +105,35 @@ class MPU6050{
 
   void update();
 
+  uint8_t getAccelerometerPowerOnDelay();
+  void setAccelerometerPowerOnDelay(uint8_t delay);
+
+  uint8_t getIntEnabled();
+  void setIntEnabled(uint8_t enabled);
+
+  bool getInterruptMode();
+  void setInterruptMode(bool mode);
+
+  bool getInterruptLatch();
+  void setInterruptLatch(bool latch);
+  bool getInterruptLatchClear();
+  void setInterruptLatchClear(bool clear);
+  
+  bool getIntMotionEnabled();
+  void setIntMotionEnabled(bool enabled);
+
+  uint8_t getDHPFMode();
+  void setDHPFMode(uint8_t mode);
+
+  // MOT_THR register
+  uint8_t getMotionDetectionThreshold();
+  void setMotionDetectionThreshold(uint8_t threshold);
+
+  // MOT_DUR register
+  uint8_t getMotionDetectionDuration();
+  void setMotionDetectionDuration(uint8_t duration);
+
+
   float getAccAngleX(){ return angleAccX; };
   float getAccAngleY(){ return angleAccY; };
 
@@ -67,6 +146,7 @@ class MPU6050{
   float getAngleZ(){ return angleZ; };
 
   private:
+  uint8_t buffer[14];
 
   TwoWire *wire;
 

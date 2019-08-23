@@ -47,8 +47,8 @@ void init_rtc() {
   Serial.print(__DATE__);
   Serial.print(" ");
   Serial.println(__TIME__);
-  if (unix_time(now) < unix_time(compileTime)) {
-    Serial.println("now < compileTime, RTC need factory reset!");
+  if (unix_time(now) < unix_time(compileTime) || now.year() < 2019 || now.year() > 2025) {
+    Serial.println("now < compileTime or year not valid, RTC need factory reset!");
     rtc.adjust(compileTime);
   } else {
     Serial.println("now >= compileTime, RTC already ok, ignore time adjustment.");

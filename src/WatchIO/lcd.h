@@ -26,9 +26,9 @@ static bool ledc_setup = false;
 void lcd_init() {
   canvas.initR(INITR_MINI160x80);  // Init ST7735S mini display
   canvas.invertDisplay(true);
-  
+
   canvas.setRotation(1);
-  
+
   canvas.fillScreen(ST77XX_BLUE);
   canvas.setCursor(20, 30);
   canvas.setTextSize(2);
@@ -42,6 +42,10 @@ void lcd_init() {
 
   // low is backlight on
   ledcWrite(0, backlight);
+}
+
+void lcd_sleep_in() {
+  canvas.sendCommand(ST77XX_SLPIN);
 }
 
 void lcd_set_brightness(uint8_t brightness) {

@@ -23,7 +23,6 @@ void init_power() {
 #else
   // rtc_clk_cpu_freq_set(RTC_CPU_FREQ_80M);
 #endif
-  Wire.begin();
 }
 
 #endif // _POWER_H

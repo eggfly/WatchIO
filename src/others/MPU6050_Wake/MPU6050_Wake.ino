@@ -6,7 +6,7 @@ MPU6050 mpu6050(Wire);
 
 long timer = 0;
 
-#define MOTION_THRESHOLD        75
+#define MOTION_THRESHOLD       65
 #define MOTION_EVENT_DURATION   5
 
 #define INTERRUPT_PIN           4

@@ -13,6 +13,8 @@
 #include "flappy_bird.h"
 #include "warning.h"
 
+#include "math.h"
+
 #include <string.h>
 #include <assert.h>
 #include "esp_partition.h"
@@ -74,8 +76,22 @@ void show_time() {
   canvas.print(buf);
 }
 
-void setup(void) {
+void setup() {
+  Wire.begin();
   Serial.begin(115200);
+  imu_init();
+  imu_init_interrupt();
+  // delay(1000);
+  int16_t accX = 0, accY = 0, accZ = 0;
+  read_imu(&accX, &accY, &accZ);
+  // abs(accX) <= 1500 && abs(accY) <= 1500 && abs(accZ) > 2300
+  if (true) {
+    Serial.println("yes, continue boot");
+  } else {
+    // 不是正确姿态
+    Serial.println("no");
+    deep_sleep_with_imu_interrupt();
+  }
 
   init_power();
   init_rtc();
@@ -97,7 +113,6 @@ void setup(void) {
   //attachInterrupt(digitalPinToInterrupt(SWITCH_DOWN), sw_down_isr, FALLING);
   attachInterrupt(digitalPinToInterrupt(SWITCH_PUSH), sw_push_isr, FALLING);
 
-  imu_init();
   bmp280_init();
 }
 
@@ -121,9 +136,9 @@ int clicked_cursor_x = -1, clicked_cursor_y = -1;
 void draw_cursor() {
   int times = 1;
   int average_accX = 0, average_accY = 0;
-  int16_t accX = 0, accY = 0;
+  int16_t accX = 0, accY = 0, accZ = 0;
   for (int i = 0; i < times; i++) {
-    read_imu(&accX, &accY);
+    read_imu(&accX, &accY, &accZ);
     average_accX += accX;
     average_accY += accY;
   }
@@ -149,9 +164,9 @@ void draw_cursor() {
 void draw_level() {
   int times = 1;
   int average_accX = 0, average_accY = 0;
-  int16_t accX = 0, accY = 0;
+  int16_t accX = 0, accY = 0, accZ = 0;
   for (int i = 0; i < times; i++) {
-    read_imu(&accX, &accY);
+    read_imu(&accX, &accY, &accZ);
     average_accX += accX;
     average_accY += accY;
   }
@@ -465,6 +480,12 @@ void fillScreen(uint16_t color) {
 }
 
 void loop() {
+  if (imu_interrupted) {
+    imu_interrupted = false;
+    int16_t accX = 0, accY = 0, accZ = 0;
+    read_imu(&accX, &accY, &accZ);
+    Serial.printf("imu_interrupted! acc=%ld,%ld,%ld\r\n", accX, accY, accZ);
+  }
   if (current_page != PAGE_3D) {
     fillScreen(ST77XX_BLACK);
   }
@@ -525,7 +546,9 @@ void home_isr() {
     return;
   }
   last_isr_time = millis();
-  ESP.restart();
+  // ESP.restart();
+  while (digitalRead(BUTTON_HOME) == 0);
+  deep_sleep_with_imu_interrupt();
 }
 
 // 中断函数

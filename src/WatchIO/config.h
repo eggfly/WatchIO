@@ -20,4 +20,5 @@
 
 #define LCD_DEFAULT_BRIGHTNESS  20
 
+
 #endif // _CONFIG_H_

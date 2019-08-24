@@ -159,8 +159,8 @@ void page_maze() {
   canvas.fillCircle(m_ball.x, m_ball.y, ball_r, ball_color);
   draw_maze();
   if (millis() - last_acc_sample_time > delta_t_ms) {
-    int16_t acc_x = 0, acc_y = 0;
-    read_imu(&acc_x, &acc_y);
+    int16_t acc_x = 0, acc_y = 0, acc_z = 0;
+    read_imu(&acc_x, &acc_y, &acc_z);
     acc_x += maze_calibration_x;
     acc_y += maze_calibration_y;
     // need swap x and y

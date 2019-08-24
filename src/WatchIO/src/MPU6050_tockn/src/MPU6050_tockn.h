@@ -26,6 +26,7 @@
 
 #define MPU6050_RA_MOT_DUR          0x20
 
+// 55
 #define MPU6050_RA_INT_PIN_CFG      0x37
 
 #define MPU6050_RA_INT_ENABLE       0x38

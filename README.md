@@ -24,6 +24,13 @@ WatchIO 是源自我多年前的一个DIY智能手表的梦想，就是给爱好
 - 气压&温度传感器（BMP280 I<sup>2</sup>C接口）
 - 侧边按钮&多功能按钮（上中下多功能按钮）
 - 120mAh Li-Po电池（内置电压ADC检测&充放电电路）
+# 固件
+
+
+为了方便不用Arduino的用户，我把最新的二进制固件和下载器放在了另一个github仓库：
+https://github.com/eggfly/WatchIO-Firmware
+同时也有国内镜像：
+https://gitee.com/egg90/WatchIO-Firmware
 
 # 文档
 

@@ -13,12 +13,8 @@
 #include "flappy_bird.h"
 #include "warning.h"
 
-#include "math.h"
-
+#include <math.h>
 #include <string.h>
-#include <assert.h>
-#include "esp_partition.h"
-#include "esp_log.h"
 
 // static const char *TAG = "app";
 
@@ -62,6 +58,9 @@ void print_wakeup_reason() {
 
 long last_rtc_update_time = 0;
 
+bool modify_time_mode = false;
+int modify_time_digit = 0;
+
 void show_time() {
   if (millis() - last_rtc_update_time > 1000) {
     last_rtc_update_time = millis();
@@ -72,8 +71,40 @@ void show_time() {
   now.format(buf);
   Serial.println(buf);
   canvas.setCursor(28, 70);
-  canvas.setTextColor(ST77XX_WHITE);
+  if (modify_time_mode) {
+    canvas.setTextColor(ST77XX_RED);
+  } else {
+    canvas.setTextColor(ST77XX_WHITE);
+  }
   canvas.print(buf);
+  if (modify_time_mode) {
+    canvas.setCursor(2, 70);
+    canvas.setTextColor(ST77XX_CYAN);
+    canvas.print("MOD:");
+    int start = 39;
+    int y = 62;
+    switch (modify_time_digit) {
+      case 0:
+        canvas.setCursor(start + 18 * 5, y);
+        break;
+      case 1:
+        canvas.setCursor(start + 18 * 4, y);
+        break;
+      case 2:
+        canvas.setCursor(start + 18 * 3, y);
+        break;
+      case 3:
+        canvas.setCursor(start + 18 * 2, y);
+        break;
+      case 4:
+        canvas.setCursor(start + 18, y);
+        break;
+      case 5:
+        canvas.setCursor(start - 8, y);
+        break;
+    }
+    canvas.print("__");
+  }
 }
 
 void setup() {
@@ -109,8 +140,8 @@ void setup() {
   print_wakeup_reason();
 
   attachInterrupt(digitalPinToInterrupt(BUTTON_HOME), home_isr, FALLING);
-  //attachInterrupt(digitalPinToInterrupt(SWITCH_UP), sw_up_isr, FALLING);
-  //attachInterrupt(digitalPinToInterrupt(SWITCH_DOWN), sw_down_isr, FALLING);
+  attachInterrupt(digitalPinToInterrupt(SWITCH_UP), sw_up_isr, FALLING);
+  attachInterrupt(digitalPinToInterrupt(SWITCH_DOWN), sw_down_isr, FALLING);
   attachInterrupt(digitalPinToInterrupt(SWITCH_PUSH), sw_push_isr, FALLING);
 
   bmp280_init();
@@ -479,6 +510,11 @@ void fillScreen(uint16_t color) {
   canvas.fillRect(0, 0, 160, 80, color);
 }
 
+bool sw_down = false;
+bool sw_up = false;
+
+unsigned long last_isr_time;
+
 void loop() {
   if (imu_interrupted) {
     imu_interrupted = false;
@@ -497,9 +533,112 @@ void loop() {
     // draw_cursor();
     draw_battery_percent();
     if (current_page == PAGE_CLOCK) {
-      delay(1000);
+      if (modify_time_mode) {
+        delay(500);
+      } else {
+        delay(1000);
+      }
     } else {
       delay(100);
+    }
+    if (modify_time_mode) {
+      if (sw_down) {
+        sw_down = false;
+        modify_time_digit++;
+        if (modify_time_digit > 5) {
+          modify_time_digit = 0;
+          modify_time_mode = false;
+        }
+      }
+      if (sw_up) {
+        sw_up = false;
+        now = rtc.now();
+        Serial.printf("modify_time_digit is %d\r\n", modify_time_digit);
+        switch (modify_time_digit) {
+          case 0:
+            {
+              uint8_t second =  now.second();
+              if (second >= 59) {
+                second = 0;
+              } else {
+                second++;
+              }
+              Serial.printf("setsecond=%d\r\n", second);
+              now.setsecond(second);
+            }
+            break;
+          case 1:
+            {
+              uint8_t minute =  now.minute();
+              if (minute >= 59) {
+                minute = 0;
+              } else {
+                minute++;
+              }
+              Serial.printf("setminute=%d\r\n", minute);
+              now.setminute(minute);
+            }
+            break;
+          case 2:
+            {
+              uint8_t hour =  now.hour();
+              if (hour >= 23) {
+                hour = 0;
+              } else {
+                hour++;
+              }
+              Serial.printf("sethour=%d\r\n", hour);
+              now.sethour(hour);
+            }
+            break;
+          case 3:
+            {
+              uint8_t day =  now.day();
+              if (day >= 31) {
+                day = 1;
+              } else {
+                day++;
+              }
+              Serial.printf("setday=%d\r\n", day);
+              now.setday(day);
+            }
+            break;
+          case 4:
+            {
+              uint8_t month =  now.month();
+              if (month >= 12) {
+                month = 1;
+              } else {
+                month++;
+              }
+              Serial.printf("setmonth=%d\r\n", month);
+              now.setmonth(month);
+            }
+            break;
+          case 5:
+            {
+              uint16_t year =  now.year();
+              if (year >= 2030) {
+                year = 2018;
+              } else {
+                year++;
+              }
+              Serial.printf("setyear=%d\r\n", year);
+              now.setyear(year);
+            }
+            break;
+        }
+        rtc.adjust(now);
+        Serial.printf("rtc.adjust()\r\n");
+
+      }
+    } else if (sw_down) {
+      while (digitalRead(SWITCH_DOWN) == 0);
+      sw_down = false;
+      if (millis() - last_isr_time > 1000) {
+        Serial.println("switch down released, modify time mode!");
+        modify_time_mode = true;
+      }
     }
   } else if (current_page == PAGE_KEYBOARD) {
     draw_bmp280();
@@ -536,7 +675,6 @@ void loop() {
   check_battery_warning_and_escape();
 }
 
-unsigned long last_isr_time;
 
 #define ISR_DITHERING_TIME_MS   250
 
@@ -561,6 +699,32 @@ void sw_push_isr() {
   current_page++;
   if (current_page > PAGE_COUNT - 1) {
     current_page = 0;
+  }
+}
+
+// 中断函数
+void sw_up_isr() {
+  if (millis() - last_isr_time < ISR_DITHERING_TIME_MS) {
+    return;
+  }
+  feed_battery_warning();
+  last_isr_time = millis();
+  if (current_page == PAGE_CLOCK) {
+    // 调节时间
+    sw_up = true;
+  }
+}
+
+// 中断函数
+void sw_down_isr() {
+  if (millis() - last_isr_time < ISR_DITHERING_TIME_MS) {
+    return;
+  }
+  feed_battery_warning();
+  last_isr_time = millis();
+  if (current_page == PAGE_CLOCK) {
+    // 进入调节时间模式
+    sw_down = true;
   }
 }
 

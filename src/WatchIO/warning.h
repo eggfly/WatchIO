@@ -3,7 +3,7 @@
 
 #include "lcd.h"
 
-#define INACTIVE_TIMEOUT_SECONDS (15)
+#define INACTIVE_TIMEOUT_SECONDS (30)
 
 long last_button_active_time = -1;
 

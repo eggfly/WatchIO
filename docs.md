@@ -27,24 +27,6 @@
 <div align="center"><img src="arduino_images/arduino5.png" width="50%" height="50%" /></div>
 - 用Arduino打开刚刚下载的当前项目源码目录(src/WatchIO)，点上传按钮等待编译并上传完成!
 <div align="center"><img src="arduino_images/arduino6.png" width="50%" height="50%" /></div>
-## ESP32 GPIO pins(WatchIO第一版)
-
-|  GPIO   | Peripheral  | Notes |
-|  ----  | ----  |  ----  |
-| GPIO0  | 侧按开关 | Pulled Up, 按下可以在启动时作为flash开关 |
-| GPIO12  | 多功能开关Pin1 | Pulled Up |
-| GPIO9  | 多功能开关Pin2 | Pulled Up |
-| GPIO13  | 多功能开关 按下 | Pulled Up |
-| GPIO4  | MPU6050 Interrupt |  |
-| GPIO32  | VBAT_SENSOR | 电池电压ADC检测，使用100K和300K电阻分压后给GPIO，GPIO电压是VBAT的四分之三 |
-| GPIO33  | TFT_RESET |  |
-| GPIO27 | TFT_DC | aka TFT_RS |
-| GPIO14 | TFT_CS | |
-| GPIO15 | TFT_BACKLIGHT | P-MOS管TFT背光控制，默认上拉不亮，低电平点亮 |
-| GPIO23 | TFT_SDA | ESP32 full speed SPI(VSPI) |
-| GPIO18 | TFT_SCL | ESP32 full speed SPI(VSPI) |
-| GPIO22 | SCL | ESP32 hardware I<sup>2</sup>C |
-| GPIO21 | SDA | ESP32 hardware I<sup>2</sup>C |
 
 ## ESP32 GPIO pins(WatchIO第二版)
 
@@ -80,3 +62,24 @@
 
 - 现在WatchIO强制烧了efuse配置flash SDIO_VCC是3.3V，也就是设置忽略了MTDI的strapping pin，这样可以释放出一个GPIO12。
 - 命令: espefuse.py set_flash_voltage 3.3V 参考 https://blog.csdn.net/u010631857/article/details/78323512 和 https://github.com/espressif/esptool/wiki/espefuse
+
+
+
+## ESP32 GPIO pins(WatchIO第一版)(Deprecated)
+
+|  GPIO   | Peripheral  | Notes |
+|  ----  | ----  |  ----  |
+| GPIO0  | 侧按开关 | Pulled Up, 按下可以在启动时作为flash开关 |
+| GPIO12  | 多功能开关Pin1 | Pulled Up |
+| GPIO9  | 多功能开关Pin2 | Pulled Up |
+| GPIO13  | 多功能开关 按下 | Pulled Up |
+| GPIO4  | MPU6050 Interrupt |  |
+| GPIO32  | VBAT_SENSOR | 电池电压ADC检测，使用100K和300K电阻分压后给GPIO，GPIO电压是VBAT的四分之三 |
+| GPIO33  | TFT_RESET |  |
+| GPIO27 | TFT_DC | aka TFT_RS |
+| GPIO14 | TFT_CS | |
+| GPIO15 | TFT_BACKLIGHT | P-MOS管TFT背光控制，默认上拉不亮，低电平点亮 |
+| GPIO23 | TFT_SDA | ESP32 full speed SPI(VSPI) |
+| GPIO18 | TFT_SCL | ESP32 full speed SPI(VSPI) |
+| GPIO22 | SCL | ESP32 hardware I<sup>2</sup>C |
+| GPIO21 | SDA | ESP32 hardware I<sup>2</sup>C |

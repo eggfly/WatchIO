@@ -8,7 +8,12 @@
 
 #define BUTTON_HOME   0
 
-#define SWITCH_UP     9
+#ifdef WATCHIO_OLD_VERSION 
+  #define SWITCH_UP     9
+#else
+  #define SWITCH_UP     5
+#endif
+
 #define SWITCH_DOWN  12
 #define SWITCH_PUSH  13
 

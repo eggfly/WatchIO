@@ -20,9 +20,21 @@ Adafruit_ST7735 canvas = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
 const int brightness_max = 255;
 const int brightness_delta = brightness_max / 20;
 
-static int backlight = 246;
-
 static bool ledc_setup = false;
+
+void fillScreen(uint16_t color) {
+  canvas.fillRect(0, 0, 160, 80, color);
+}
+
+void lcd_set_brightness(uint8_t brightness) {
+  if (ledc_setup) {
+    Serial.print("lcd_set_brightness: ");
+    Serial.println(brightness);
+    ledcWrite(0, 255 - brightness);
+  }
+}
+
+
 void lcd_init() {
   canvas.initR(INITR_MINI160x80);  // Init ST7735S mini display
   canvas.invertDisplay(true);
@@ -41,20 +53,11 @@ void lcd_init() {
   ledc_setup = true;
 
   // low is backlight on
-  ledcWrite(0, backlight);
+  lcd_set_brightness(LCD_DEFAULT_BRIGHTNESS);
 }
 
 void lcd_sleep_in() {
   canvas.sendCommand(ST77XX_SLPIN);
-}
-
-void lcd_set_brightness(uint8_t brightness) {
-  if (ledc_setup) {
-    Serial.print("lcd_set_brightness: ");
-    Serial.println(brightness);
-
-    ledcWrite(0, 255 - brightness);
-  }
 }
 
 void sendGRAM() {

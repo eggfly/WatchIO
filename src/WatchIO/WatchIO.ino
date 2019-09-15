@@ -139,7 +139,7 @@ void setup() {
   //Print the wakeup reason for ESP32
   print_wakeup_reason();
 
-  attachInterrupt(digitalPinToInterrupt(BUTTON_HOME), home_isr, FALLING);
+  attachInterrupt(digitalPinToInterrupt(BUTTON_HOME), home_isr, CHANGE);
   attachInterrupt(digitalPinToInterrupt(SWITCH_UP), sw_up_isr, FALLING);
   attachInterrupt(digitalPinToInterrupt(SWITCH_DOWN), sw_down_isr, FALLING);
   attachInterrupt(digitalPinToInterrupt(SWITCH_PUSH), sw_push_isr, FALLING);
@@ -506,16 +506,21 @@ void check_lcd_brightness_change() {
   }
 }
 
-void fillScreen(uint16_t color) {
-  canvas.fillRect(0, 0, 160, 80, color);
-}
 
 bool sw_down = false;
 bool sw_up = false;
+bool sw_home_down = false;
+bool sw_home_up = false;
 
 unsigned long last_isr_time;
 
 void loop() {
+  if (sw_home_down || sw_home_up) {
+    if (sw_home_up) {
+      delay(100);
+      deep_sleep_with_imu_interrupt();
+    }
+  }
   if (imu_interrupted) {
     imu_interrupted = false;
     int16_t accX = 0, accY = 0, accZ = 0;
@@ -677,16 +682,19 @@ void loop() {
 
 
 #define ISR_DITHERING_TIME_MS   250
+#define ISR_SHORT_DITHERING_TIME_MS   50
 
 // 中断函数
 void home_isr() {
-  if (millis() - last_isr_time < ISR_DITHERING_TIME_MS) {
+  if (millis() - last_isr_time < ISR_SHORT_DITHERING_TIME_MS) {
     return;
   }
   last_isr_time = millis();
-  // ESP.restart();
-  while (digitalRead(BUTTON_HOME) == 0);
-  deep_sleep_with_imu_interrupt();
+  if (digitalRead(BUTTON_HOME)) {
+    sw_home_up = true;
+  } else {
+    sw_home_down = true;
+  }
 }
 
 // 中断函数

@@ -23,7 +23,7 @@
 #define LCD_MAX_BRIGHTNESS      255
 #define LCD_MIN_BRIGHTNESS      0
 
-#define LCD_DEFAULT_BRIGHTNESS  20
+#define LCD_DEFAULT_BRIGHTNESS  25
 
 
 #endif // _CONFIG_H_

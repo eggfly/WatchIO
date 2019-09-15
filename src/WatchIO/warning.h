@@ -3,7 +3,7 @@
 
 #include "lcd.h"
 
-#define INACTIVE_TIMEOUT_SECONDS (30)
+#define INACTIVE_TIMEOUT_SECONDS (60)
 
 long last_button_active_time = -1;
 
@@ -27,6 +27,30 @@ void draw_warning() {
 }
 
 void deep_sleep_with_imu_interrupt() {
+  int count = 20;
+  float delta = (LCD_DEFAULT_BRIGHTNESS - LCD_MIN_BRIGHTNESS) / float(count);
+  for (int i = 1; i <= count; i++) {
+    delay(300 / count);
+    lcd_set_brightness(LCD_DEFAULT_BRIGHTNESS - delta * i);
+  }
+
+  fillScreen(ST77XX_BLACK);
+  // Set max brigtness to show white lines more clearly!
+  lcd_set_brightness(LCD_DEFAULT_BRIGHTNESS + 10);
+  for (int i = 0; i < SCREEN_HEIGHT / 2; i++) {
+    canvas.drawFastHLine(0, i - 1, SCREEN_WIDTH, ST77XX_BLACK);
+    canvas.drawFastHLine(0, i, SCREEN_WIDTH, ST77XX_WHITE);
+    canvas.drawFastHLine(0, SCREEN_HEIGHT - i + 1, SCREEN_WIDTH, ST77XX_BLACK);
+    canvas.drawFastHLine(0, SCREEN_HEIGHT - i, SCREEN_WIDTH, ST77XX_WHITE);
+    delay(200 / SCREEN_HEIGHT);
+  }
+  fillScreen(ST77XX_BLACK);
+  for (int i = 0; i < SCREEN_WIDTH / 2; i++) {
+    canvas.drawFastHLine(0, SCREEN_HEIGHT / 2, SCREEN_WIDTH, ST77XX_BLACK);
+    canvas.drawFastHLine(i, SCREEN_HEIGHT / 2, SCREEN_WIDTH - i * 2, ST77XX_WHITE);
+    delay(200 / SCREEN_HEIGHT);
+  }
+
   // esp_sleep_enable_ext0_wakeup(GPIO_NUM_4, 0); //1 = High, 0 = Low
   esp_sleep_enable_ext0_wakeup(GPIO_NUM_0, 0); //1 = High, 0 = Low
   // esp_sleep_enable_ext0_wakeup(GPIO_NUM_39, 0); //1 = High, 0 = Low

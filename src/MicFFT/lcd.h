@@ -8,7 +8,7 @@
 
 #define RGB565(r, g, b) ((((r>>3)<<11) | ((g>>2)<<5) | (b>>3)))
 
-#define TFT_CS          14 // Hallowing display control pins: chip select
+#define TFT_CS          5 // Hallowing display control pins: chip select
 #define TFT_RST         33 // Display reset
 #define TFT_DC          27 // Display data/command select
 #define TFT_BACKLIGHT   15 // Display backlight pin

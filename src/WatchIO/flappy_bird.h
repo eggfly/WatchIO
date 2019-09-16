@@ -99,6 +99,10 @@ bool game_button_active() {
   return digitalRead(SWITCH_DOWN) == LOW || digitalRead(SWITCH_UP) == LOW;
 }
 
+bool push_button_active() {
+  return digitalRead(SWITCH_PUSH) == LOW;
+}
+
 // ---------------
 // game loop
 // ---------------
@@ -135,7 +139,7 @@ void game_loop() {
 
   while (1) {
     loops = 0;
-    while ( millis() > next_game_tick && loops < MAX_FRAMESKIP) {
+    while (millis() > next_game_tick && loops < MAX_FRAMESKIP) {
       if (game_button_active()) {
         if (bird.y > BIRDH2 * 0.5) bird.vel_y = -JUMP_FORCE;
         // else zero velocity
@@ -291,7 +295,7 @@ void game_init() {
 // ---------------
 // game start
 // ---------------
-void game_start() {
+bool game_start() {
   delay(0);
   canvas.fillScreen(ST77XX_BLACK);
   canvas.fillRect(0, TFTH2 - 10, TFTW, 1, ST77XX_WHITE);
@@ -310,14 +314,19 @@ void game_start() {
   canvas.setCursor( TFTW2 - 40, TFTH2 + 21);
   canvas.println("please press side button");
   while (1) {
+    if (push_button_active()) {
+      while (push_button_active()) {}
+      return true;
+    }
     // wait for push button
     if (game_button_active()) {
-      while (game_button_active());
+      while (game_button_active()) {}
       break;
     }
   }
   // init game settings
   game_init();
+  return false;
 }
 
 void EEPROM_Read(unsigned int *num) {
@@ -333,7 +342,7 @@ void EEPROM_Write(unsigned int *num) {
 // ---------------
 // game over
 // ---------------
-void game_over() {
+bool game_over() {
   canvas.fillScreen(ST77XX_BLACK);
   EEPROM_Read(&maxScore);
   canvas.setTextColor(ST77XX_RED);
@@ -359,15 +368,19 @@ void game_over() {
   canvas.print(maxScore);
 
   sendGRAM();
+  bool is_push_button_active;
   while (1) {
     check_battery_warning_and_escape();
+    if (push_button_active()) {
+      while (push_button_active()) {}
+      return true;
+    }
     // wait for push button
     if (game_button_active()) {
-      while (game_button_active());
-      break;
+      while (game_button_active()) {}
+      return false;
     }
   }
-  Serial.printf("game_over 8\n");
 }
 
 void readMaxScore() {
@@ -378,11 +391,15 @@ void readMaxScore() {
 void flappy_bird_dead_loop() {
   while (1) {
     Serial.println("debug111");
-    game_start();
+    if (game_start()) {
+      break;
+    }
     Serial.println("debug222");
     game_loop();
     Serial.println("debug333");
-    game_over();
+    if (game_over()) {
+      break;
+    }
     Serial.println("debug444");
   }
 }
@@ -396,7 +413,7 @@ void page_flappy_bird() {
   // game_start();
   // game_loop();
   // game_over();
-  // canvas.setRotation(1); // set back to original rotation
+  canvas.setRotation(1); // set back to original rotation
 }
 
 #endif // _FLAPPY_BIRD_H

@@ -25,5 +25,6 @@
 
 #define LCD_DEFAULT_BRIGHTNESS  25
 
+#define LONG_PRESS_TIME   1000
 
 #endif // _CONFIG_H_

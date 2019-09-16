@@ -51,8 +51,9 @@ void deep_sleep_with_imu_interrupt() {
     delay(200 / SCREEN_HEIGHT);
   }
 
+  while (digitalRead(SWITCH_PUSH) == LOW) {}
   // esp_sleep_enable_ext0_wakeup(GPIO_NUM_4, 0); //1 = High, 0 = Low
-  esp_sleep_enable_ext0_wakeup(GPIO_NUM_0, 0); //1 = High, 0 = Low
+  esp_sleep_enable_ext0_wakeup(GPIO_NUM_13, 0); //1 = High, 0 = Low
   // esp_sleep_enable_ext0_wakeup(GPIO_NUM_39, 0); //1 = High, 0 = Low
   // esp_sleep_enable_ext1_wakeup(1 << 0, ESP_EXT1_WAKEUP_ANY_LOW);
 

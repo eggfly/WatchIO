@@ -142,7 +142,7 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(BUTTON_HOME), home_isr, CHANGE);
   attachInterrupt(digitalPinToInterrupt(SWITCH_UP), sw_up_isr, FALLING);
   attachInterrupt(digitalPinToInterrupt(SWITCH_DOWN), sw_down_isr, FALLING);
-  attachInterrupt(digitalPinToInterrupt(SWITCH_PUSH), sw_push_isr, FALLING);
+  attachInterrupt(digitalPinToInterrupt(SWITCH_PUSH), sw_push_isr, CHANGE);
 
   bmp280_init();
 }
@@ -521,6 +521,9 @@ void loop() {
       deep_sleep_with_imu_interrupt();
     }
   }
+  if (is_sw_push_long_press_reached()) {
+    deep_sleep_with_imu_interrupt();
+  }
   if (imu_interrupted) {
     imu_interrupted = false;
     int16_t accX = 0, accY = 0, accZ = 0;
@@ -670,6 +673,7 @@ void loop() {
     page_maze();
   } else if (current_page == PAGE_FLAPPY_BIRD) {
     page_flappy_bird();
+    // code goes here indicates that flappy-bird has exited.
   }
 
   loopTime = millis();
@@ -681,7 +685,7 @@ void loop() {
 }
 
 
-#define ISR_DITHERING_TIME_MS   250
+#define ISR_DITHERING_TIME_MS   300
 #define ISR_SHORT_DITHERING_TIME_MS   50
 
 // 中断函数
@@ -697,17 +701,38 @@ void home_isr() {
   }
 }
 
-// 中断函数
-void sw_push_isr() {
-  if (millis() - last_isr_time < ISR_DITHERING_TIME_MS) {
-    return;
-  }
-  feed_battery_warning();
-  last_isr_time = millis();
+void navigateToNextPage() {
   current_page++;
   if (current_page > PAGE_COUNT - 1) {
     current_page = 0;
   }
+}
+
+long last_sw_push_down_time = 0;
+
+bool is_sw_push_long_press_reached() {
+  bool reached = last_sw_push_down_time != 0 && (millis() - last_sw_push_down_time > LONG_PRESS_TIME);
+  if (reached) {
+    Serial.println("sw_push_long_press_reached!");
+  }
+  return reached;
+}
+
+// 中断函数
+void sw_push_isr() {
+  feed_battery_warning();
+  if (digitalRead(SWITCH_PUSH) == LOW) {
+    // key down
+    if (millis() - last_isr_time < ISR_DITHERING_TIME_MS) {
+      return;
+    }
+    last_sw_push_down_time = millis();
+  } else {
+    // key up
+    last_sw_push_down_time = 0;
+    navigateToNextPage();
+  }
+  last_isr_time = millis();
 }
 
 // 中断函数

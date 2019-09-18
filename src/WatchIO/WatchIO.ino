@@ -145,6 +145,11 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(SWITCH_PUSH), sw_push_isr, CHANGE);
 
   bmp280_init();
+
+#ifdef LIU_YU_XUAN_ENABLED
+  draw_liuyuxuan();
+  delay(5000);
+#endif
 }
 
 long loopTime, startTime, endTime, fps;
@@ -156,6 +161,7 @@ long loopTime, startTime, endTime, fps;
 #define PAGE_3D                 4
 #define PAGE_MAZE               5
 #define PAGE_FLAPPY_BIRD        6
+
 
 #define PAGE_COUNT              7
 

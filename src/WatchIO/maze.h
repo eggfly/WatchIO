@@ -3,6 +3,7 @@
 
 #include "config.h"
 #include "lcd.h"
+#include "res.h"
 
 // actually y
 #define maze_calibration_x     0
@@ -154,6 +155,12 @@ void find_nearest_walls(double x, double y, double *left, double *right, double 
 }
 
 void page_maze() {
+#ifdef LIU_YU_XUAN_ENABLED
+  draw_liuyuxuan();
+  delay(2000);
+  return;
+#endif
+
   // canvas.setRotation(1);
   canvas.fillScreen(ST77XX_BLACK);
   canvas.fillCircle(m_ball.x, m_ball.y, ball_r, ball_color);

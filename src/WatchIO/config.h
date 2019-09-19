@@ -8,7 +8,7 @@
 
 #define BUTTON_HOME   0
 
-#define LIU_YU_XUAN_ENABLED   1
+// #define LIU_YU_XUAN_ENABLED   1
 
 #ifdef WATCHIO_OLD_VERSION 
   #define SWITCH_UP     9

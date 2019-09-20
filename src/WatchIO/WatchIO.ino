@@ -521,6 +521,8 @@ bool sw_home_up = false;
 unsigned long last_isr_time;
 
 void loop() {
+  // canvas.drawRGBBitmap(0, 0, (uint16_t*)caixukun2, 142, 80);
+  // delay(10000);
   if (sw_home_down || sw_home_up) {
     if (sw_home_up) {
       delay(100);

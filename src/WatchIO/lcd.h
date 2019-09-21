@@ -13,7 +13,14 @@
 #define TFT_DC          27 // Display data/command select
 #define TFT_BACKLIGHT   15 // Display backlight pin
 
-Adafruit_ST7735 canvas = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
+#define CANVAS_WIDTH    SCREEN_WIDTH
+#define CANVAS_HEIGHT   SCREEN_HEIGHT
+
+// real screen
+Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
+
+// frame buffer in RAM
+GFXcanvas16 canvas = GFXcanvas16(CANVAS_WIDTH, CANVAS_HEIGHT);
 
 #define ST77XX_GRAY  0x7BEF
 
@@ -26,6 +33,11 @@ void fillScreen(uint16_t color) {
   canvas.fillRect(0, 0, 160, 80, color);
 }
 
+void tftFillScreen(uint16_t color) {
+  tft.fillRect(0, 0, 160, 80, color);
+}
+
+
 void lcd_set_brightness(uint8_t brightness) {
   if (ledc_setup) {
     Serial.print("lcd_set_brightness: ");
@@ -34,12 +46,29 @@ void lcd_set_brightness(uint8_t brightness) {
   }
 }
 
+long last_lcd_flush_time = 0;
+
+void sendGRAM(bool force) {
+  long m = millis();
+  if (force || m - last_lcd_flush_time > 16.667) {
+    tft.drawRGBBitmap(0, 0, canvas.getBuffer(), CANVAS_WIDTH, CANVAS_HEIGHT);
+    last_lcd_flush_time = millis();
+  } else {
+    Serial.printf("sendGRAM() ignored, delta time=%ld\r\n", m - last_lcd_flush_time);
+  }
+}
+
+void sendGRAM() {
+  sendGRAM(false);
+}
+
 
 void lcd_init() {
-  canvas.initR(INITR_MINI160x80);  // Init ST7735S mini display
+  tft.initR(INITR_MINI160x80);  // Init ST7735S mini display
+  tft.invertDisplay(true);
   canvas.invertDisplay(true);
 
-  canvas.setRotation(1);
+  tft.setRotation(1);
 
   canvas.fillScreen(ST77XX_BLUE);
   canvas.setCursor(20, 30);
@@ -47,6 +76,7 @@ void lcd_init() {
   canvas.setTextColor(ST77XX_WHITE);
   canvas.print("loading...");
   canvas.setTextSize(1);
+  sendGRAM();
   // setup pwm channel
   ledcSetup(0, 5000, 8);
   ledcAttachPin(TFT_BACKLIGHT, 0);
@@ -57,10 +87,9 @@ void lcd_init() {
 }
 
 void lcd_sleep_in() {
-  canvas.sendCommand(ST77XX_SLPIN);
+  tft.sendCommand(ST77XX_SLPIN);
 }
 
-void sendGRAM() {
-}
+
 
 #endif // _LCD_H

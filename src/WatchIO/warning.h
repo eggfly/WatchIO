@@ -34,21 +34,21 @@ void deep_sleep_with_imu_interrupt() {
     lcd_set_brightness(LCD_DEFAULT_BRIGHTNESS - delta * i);
   }
 
-  fillScreen(ST77XX_BLACK);
+  tftFillScreen(ST77XX_BLACK);
   // Set max brigtness to show white lines more clearly!
   lcd_set_brightness(LCD_DEFAULT_BRIGHTNESS + 10);
   for (int i = 0; i < SCREEN_HEIGHT / 2; i++) {
-    canvas.drawFastHLine(0, i - 1, SCREEN_WIDTH, ST77XX_BLACK);
-    canvas.drawFastHLine(0, i, SCREEN_WIDTH, ST77XX_WHITE);
-    canvas.drawFastHLine(0, SCREEN_HEIGHT - i + 1, SCREEN_WIDTH, ST77XX_BLACK);
-    canvas.drawFastHLine(0, SCREEN_HEIGHT - i, SCREEN_WIDTH, ST77XX_WHITE);
+    tft.drawFastHLine(0, i - 1, SCREEN_WIDTH, ST77XX_BLACK);
+    tft.drawFastHLine(0, i, SCREEN_WIDTH, ST77XX_WHITE);
+    tft.drawFastHLine(0, SCREEN_HEIGHT - i + 1, SCREEN_WIDTH, ST77XX_BLACK);
+    tft.drawFastHLine(0, SCREEN_HEIGHT - i, SCREEN_WIDTH, ST77XX_WHITE);
     delay(200 / SCREEN_HEIGHT);
   }
-  fillScreen(ST77XX_BLACK);
+  tftFillScreen(ST77XX_BLACK);
   for (int i = 0; i < SCREEN_WIDTH / 2; i++) {
-    canvas.drawFastHLine(0, SCREEN_HEIGHT / 2, SCREEN_WIDTH, ST77XX_BLACK);
-    canvas.drawFastHLine(i, SCREEN_HEIGHT / 2, SCREEN_WIDTH - i * 2, ST77XX_WHITE);
-    delay(200 / SCREEN_HEIGHT);
+    tft.drawFastHLine(0, SCREEN_HEIGHT / 2, SCREEN_WIDTH, ST77XX_BLACK);
+    tft.drawFastHLine(i, SCREEN_HEIGHT / 2, SCREEN_WIDTH - i * 2, ST77XX_WHITE);
+    delay(200 / SCREEN_WIDTH);
   }
 
   while (digitalRead(SWITCH_PUSH) == LOW) {}

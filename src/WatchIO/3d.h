@@ -106,17 +106,18 @@ void draw() {
   graphics.setTextColor(0xE75C); // nearly white
   graphics.setCursor(5, 2);
   graphics.print("free memory: ");
-  Serial.print("free memory: ");
+  // Serial.print("free memory: ");
   graphics.print((int)heap_caps_get_free_size(MALLOC_CAP_DEFAULT));
-  Serial.println((int)heap_caps_get_free_size(MALLOC_CAP_DEFAULT));
+  // Serial.println((int)heap_caps_get_free_size(MALLOC_CAP_DEFAULT));
   graphics.print(" fps: ");
-  Serial.print(" fps: ");
+  // Serial.print(" fps: ");
   graphics.print(fps, 10, 2);
-  Serial.println(fps);
+  // Serial.println(fps);
   graphics.print(" triangles/s: ");
   graphics.print(tps);
   graphics.end();
-  delay(2);
+  sendGRAM();
+  delay(1);
 }
 
 void page_3d() {

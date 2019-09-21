@@ -27,6 +27,11 @@
 
 #define LCD_DEFAULT_BRIGHTNESS  25
 
+
+#define ISR_DITHERING_TIME_MS   300
+#define ISR_SHORT_DITHERING_TIME_MS   50
+
+
 #define LONG_PRESS_TIME   1000
 
 #endif // _CONFIG_H_

@@ -1,3 +1,4 @@
+// TODO 亮度控制
 
 #include "config.h"
 #include "res.h"
@@ -69,7 +70,7 @@ void show_time() {
   char buf[100];
   strncpy(buf, "YYYY.MM.DD hh:mm:ss\0", 100);
   now.format(buf);
-  Serial.println(buf);
+  // Serial.println(buf);
   canvas.setCursor(28, 70);
   if (modify_time_mode) {
     canvas.setTextColor(ST77XX_RED);
@@ -166,6 +167,7 @@ long loopTime, startTime, endTime, fps;
 #define PAGE_COUNT              7
 
 int current_page = PAGE_CLOCK;
+bool current_page_changed = false;
 
 int cursorX, cursorY;
 int clicked_cursor_x = -1, clicked_cursor_y = -1;
@@ -520,7 +522,63 @@ bool sw_home_up = false;
 
 unsigned long last_isr_time;
 
+// 0: key up, 1: key down
+uint8_t push_button_value = 0;
+bool push_button_changed = false;
+unsigned long last_push_button_isr_time = 0;
+long last_sw_push_down_time = 0;
+
+// 按键按下的回调(可任意修改)
+void onPushKeyDown() {
+}
+
+// 按键松开的回调(可任意修改)
+void onPushKeyUp() {
+  navigateToNextPage();
+}
+
+// 按键变化函数(不需要修改)
+void onPushButtonChanged(uint8_t push_button_value) {
+  Serial.printf("onPushButtonChanged, value=%d\r\n", push_button_value);
+  if (1 == push_button_value) {
+    last_sw_push_down_time = millis();
+    onPushKeyDown();
+  } else if (0 == push_button_value) {
+    // clear long presd time
+    last_sw_push_down_time = 0;
+    onPushKeyUp();
+  }
+}
+
+void onPushButtonLongPressed() {
+  deep_sleep_with_imu_interrupt();
+}
+
+// 按键防抖动处理(需要在主线程loop函数调用)
+void handle_button_event_in_main_loop() {
+  if (push_button_changed) {
+    Serial.printf("push_button_changed\r\n");
+    long m = millis();
+    if (m - last_push_button_isr_time > ISR_SHORT_DITHERING_TIME_MS
+        || m == last_push_button_isr_time /* for flappy bird */) {
+      push_button_changed = false;
+      onPushButtonChanged(push_button_value);
+    } else {
+      Serial.printf("handle_button_event_in_main_loop() ISR_SHORT_DITHERING_TIME_MS not reached, %ld, %ld, %ld\r\n",
+                    m, last_push_button_isr_time, m - last_push_button_isr_time);
+    }
+  }
+  if (is_sw_push_long_press_reached()) {
+    onPushButtonLongPressed();
+  }
+}
+
 void loop() {
+  handle_button_event_in_main_loop();
+  if (current_page_changed) {
+    current_page_changed = false;
+    Serial.printf("page changed to: %d\r\n", current_page);
+  }
   // canvas.drawRGBBitmap(0, 0, (uint16_t*)caixukun2, 142, 80);
   // delay(10000);
   if (sw_home_down || sw_home_up) {
@@ -528,9 +586,6 @@ void loop() {
       delay(100);
       deep_sleep_with_imu_interrupt();
     }
-  }
-  if (is_sw_push_long_press_reached()) {
-    deep_sleep_with_imu_interrupt();
   }
   if (imu_interrupted) {
     imu_interrupted = false;
@@ -550,12 +605,12 @@ void loop() {
     draw_battery_percent();
     if (current_page == PAGE_CLOCK) {
       if (modify_time_mode) {
-        delay(500);
+        // delay(500);
       } else {
-        delay(1000);
+        // delay(1000);
       }
     } else {
-      delay(100);
+      // delay(100);
     }
     if (modify_time_mode) {
       if (sw_down) {
@@ -656,6 +711,7 @@ void loop() {
         modify_time_mode = true;
       }
     }
+    sendGRAM();
   } else if (current_page == PAGE_KEYBOARD) {
     draw_bmp280();
     page_keyboard();
@@ -693,9 +749,6 @@ void loop() {
 }
 
 
-#define ISR_DITHERING_TIME_MS   300
-#define ISR_SHORT_DITHERING_TIME_MS   50
-
 // 中断函数
 void home_isr() {
   if (millis() - last_isr_time < ISR_SHORT_DITHERING_TIME_MS) {
@@ -710,13 +763,14 @@ void home_isr() {
 }
 
 void navigateToNextPage() {
+  Serial.printf("navigateToNextPage, page=%d\r\n", current_page);
+  current_page_changed = true;
   current_page++;
   if (current_page > PAGE_COUNT - 1) {
     current_page = 0;
   }
 }
 
-long last_sw_push_down_time = 0;
 
 bool is_sw_push_long_press_reached() {
   bool reached = last_sw_push_down_time != 0 && (millis() - last_sw_push_down_time > LONG_PRESS_TIME);
@@ -731,15 +785,13 @@ void sw_push_isr() {
   feed_battery_warning();
   if (digitalRead(SWITCH_PUSH) == LOW) {
     // key down
-    if (millis() - last_isr_time < ISR_DITHERING_TIME_MS) {
-      return;
-    }
-    last_sw_push_down_time = millis();
+    push_button_value = 1;
   } else {
     // key up
-    last_sw_push_down_time = 0;
-    navigateToNextPage();
+    push_button_value = 0;
   }
+  push_button_changed = true;
+  last_push_button_isr_time = millis();
   last_isr_time = millis();
 }
 

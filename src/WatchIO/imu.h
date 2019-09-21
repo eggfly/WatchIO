@@ -59,26 +59,26 @@ void imu_init_interrupt() {
 void read_imu(int16_t *accX, int16_t *accY, int16_t *accZ) {
   if (millis() - imu_timer > IMU_SAMPLE_DURATION) {
     mpu6050.update();
-    Serial.println("=======================================================");
-    Serial.print("temp : "); Serial.println(mpu6050.getTemp());
-    Serial.print("accX : "); Serial.print(mpu6050.getAccX());
-    Serial.print("\taccY : "); Serial.print(mpu6050.getAccY());
-    Serial.print("\taccZ : "); Serial.println(mpu6050.getAccZ());
-
-    Serial.print("accAngleX : "); Serial.print(mpu6050.getAccAngleX());
-    Serial.print("\taccAngleY : "); Serial.println(mpu6050.getAccAngleY());
-
-    Serial.print("angleX : "); Serial.print(mpu6050.getAngleX());
-    Serial.print("\tangleY : "); Serial.print(mpu6050.getAngleY());
-    Serial.print("\tangleZ : "); Serial.println(mpu6050.getAngleZ());
-    Serial.println("=======================================================\n");
+    //    Serial.println("=======================================================");
+    //    Serial.print("temp : "); Serial.println(mpu6050.getTemp());
+    //    Serial.print("accX : "); Serial.print(mpu6050.getAccX());
+    //    Serial.print("\taccY : "); Serial.print(mpu6050.getAccY());
+    //    Serial.print("\taccZ : "); Serial.println(mpu6050.getAccZ());
+    //
+    //    Serial.print("accAngleX : "); Serial.print(mpu6050.getAccAngleX());
+    //    Serial.print("\taccAngleY : "); Serial.println(mpu6050.getAccAngleY());
+    //
+    //    Serial.print("angleX : "); Serial.print(mpu6050.getAngleX());
+    //    Serial.print("\tangleY : "); Serial.print(mpu6050.getAngleY());
+    //    Serial.print("\tangleZ : "); Serial.println(mpu6050.getAngleZ());
+    //    Serial.println("=======================================================\n");
     imu_timer = millis();
   }
   // reverse x and y, this is a hack
   *accX = -3000 * mpu6050.getAccY();
   *accY = -3000 * mpu6050.getAccX();
   *accZ = -3000 * mpu6050.getAccZ();
-  Serial.printf("%ld,%ld,%ld\r\n", *accX, *accY, *accZ);
+  // Serial.printf("%ld,%ld,%ld\r\n", *accX, *accY, *accZ);
 }
 
 #endif // _IMU_H_

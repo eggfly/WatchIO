@@ -135,7 +135,7 @@ void game_loop() {
   // temp var for setAddrWindow
   unsigned char px;
   unsigned char bpx;
-  sendGRAM();
+  sendGRAM(true);
 
   while (1) {
     loops = 0;
@@ -237,14 +237,14 @@ void game_loop() {
     // ===============
     // if the bird hit the ground game over
     if (bird.y > GAMEH - BIRDH) {
-      sendGRAM();
+      sendGRAM(true);
       break;
     }
     // checking for bird collision with pipe
     if (bird.x + BIRDW >= pipes.x - BIRDW2 && bird.x <= pipes.x + PIPEW - BIRDW) {
       // bird entered a pipe, check for collision
       if (bird.y < pipes.gap_y || bird.y + BIRDH > pipes.gap_y + GAPHEIGHT) {
-        sendGRAM();
+        sendGRAM(true);
         break;
       }
       else passed_pipe = true;
@@ -266,7 +266,7 @@ void game_loop() {
     // ---------------
     canvas.setCursor( 2, 4);
     canvas.print(score);
-    sendGRAM();
+    sendGRAM(true);
   }
 
   // add a small delay to show how the player lost
@@ -284,7 +284,6 @@ void game_init() {
   bird.vel_y = -JUMP_FORCE;
   tmpx = tmpy = 0;
   // generate new random seed for the pipe gape
-  Serial.println("analog");
   randomSeed(analogRead(VBAT_SENSOR));
   // randomSeed(255);
   // init pipe
@@ -313,6 +312,7 @@ bool game_start() {
   canvas.println("WatchIO");
   canvas.setCursor( TFTW2 - 40, TFTH2 + 21);
   canvas.println("please press side button");
+  sendGRAM(true);
   while (1) {
     if (push_button_active()) {
       while (push_button_active()) {}
@@ -367,7 +367,7 @@ bool game_over() {
   canvas.print("Max Score:");
   canvas.print(maxScore);
 
-  sendGRAM();
+  sendGRAM(true);
   bool is_push_button_active;
   while (1) {
     check_battery_warning_and_escape();
@@ -394,26 +394,23 @@ void flappy_bird_dead_loop() {
     if (game_start()) {
       break;
     }
-    Serial.println("debug222");
+    Serial.println("FlappyBird_222");
     game_loop();
-    Serial.println("debug333");
+    Serial.println("FlappyBird_333");
     if (game_over()) {
       break;
     }
-    Serial.println("debug444");
+    Serial.println("FlappyBird_444");
   }
 }
 
 void page_flappy_bird() {
-  canvas.setRotation(2);
+  canvas.setRotation(1);
   preferences.begin("flappy-bird", false);
   readMaxScore();
   Serial.println("debug000");
   flappy_bird_dead_loop();
-  // game_start();
-  // game_loop();
-  // game_over();
-  canvas.setRotation(1); // set back to original rotation
+  canvas.setRotation(0); // set back to original rotation
 }
 
 #endif // _FLAPPY_BIRD_H

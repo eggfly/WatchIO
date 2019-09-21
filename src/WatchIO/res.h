@@ -196,6 +196,7 @@ uint8_t liuyuxuan_data[] = {
 
 void draw_liuyuxuan() {
   canvas.drawRGBBitmap(0, 0, (uint16_t*)liuyuxuan_data, 160, 80);
+  sendGRAM();
 }
 
 uint8_t clock_data[] = {

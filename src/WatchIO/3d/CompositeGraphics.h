@@ -121,6 +121,7 @@ class CompositeGraphics
       // eggfly modified
       // uint32_t c = (color << 16) | (color << 8) | color;
       uint16_t c = RGB565(color, color, color);
+      //Serial.printf("%d\r\n",c);
       canvas.drawPixel(x, y, c);
       // backbuffer[y][x] = color;
     }

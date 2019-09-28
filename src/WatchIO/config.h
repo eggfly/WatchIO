@@ -8,7 +8,7 @@
 
 #define BUTTON_HOME   0
 
-// #define LIU_YU_XUAN_ENABLED   1
+#define SPLASH_ENABLED   1
 
 #ifdef WATCHIO_OLD_VERSION 
   #define SWITCH_UP     9
@@ -26,6 +26,7 @@
 #define LCD_MIN_BRIGHTNESS      0
 
 #define LCD_DEFAULT_BRIGHTNESS  25
+// #define LCD_DEFAULT_BRIGHTNESS  4
 
 
 #define ISR_DITHERING_TIME_MS   300

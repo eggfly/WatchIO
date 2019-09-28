@@ -147,9 +147,8 @@ void setup() {
 
   bmp280_init();
 
-#ifdef LIU_YU_XUAN_ENABLED
-  draw_liuyuxuan();
-  delay(5000);
+#ifdef SPLASH_ENABLED
+  show_splash();
 #endif
 }
 
@@ -163,8 +162,9 @@ long loopTime, startTime, endTime, fps;
 #define PAGE_MAZE               5
 #define PAGE_FLAPPY_BIRD        6
 
+#define PAGE_SPLASH             7
 
-#define PAGE_COUNT              7
+#define PAGE_COUNT              8
 
 int current_page = PAGE_CLOCK;
 bool current_page_changed = false;
@@ -738,6 +738,8 @@ void loop() {
   } else if (current_page == PAGE_FLAPPY_BIRD) {
     page_flappy_bird();
     // code goes here indicates that flappy-bird has exited.
+  } else if (current_page == PAGE_SPLASH) {
+    page_splash();
   }
 
   loopTime = millis();

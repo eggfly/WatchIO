@@ -9,7 +9,7 @@ void draw_splash();
 
 void show_splash() {
   draw_splash();
-  delay(3000);
+  delay(1000);
 }
 
 void page_splash() {

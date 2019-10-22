@@ -145,7 +145,9 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(SWITCH_DOWN), sw_down_isr, FALLING);
   attachInterrupt(digitalPinToInterrupt(SWITCH_PUSH), sw_push_isr, CHANGE);
 
+#ifdef BMP280_ENABLED
   bmp280_init();
+#endif
 
 #ifdef SPLASH_ENABLED
   show_splash();
@@ -239,6 +241,7 @@ void draw_level() {
 }
 
 void draw_bmp280() {
+#ifdef BMP280_ENABLED
   read_bmp280();
 
   canvas.setCursor(0, 2);
@@ -257,6 +260,7 @@ void draw_bmp280() {
   canvas.print(F(""));
   canvas.print(bmp280_pressure / 1000, 2);
   canvas.print("kPa ");
+#endif
 }
 
 void draw_menu() {

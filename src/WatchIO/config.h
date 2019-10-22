@@ -5,6 +5,7 @@
 #define SCREEN_HEIGHT  80
 
 // #define APP_DEBUG
+#define BMP280_ENABLED
 
 #define BUTTON_HOME   0
 

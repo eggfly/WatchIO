@@ -58,7 +58,7 @@ void sendGRAM(bool force) {
     tft.drawRGBBitmap(0, 0, canvas.getBuffer(), CANVAS_WIDTH, CANVAS_HEIGHT);
     last_lcd_flush_time = millis();
   } else {
-    Serial.printf("sendGRAM() ignored, delta time=%ld\r\n", m - last_lcd_flush_time);
+    // Serial.printf("sendGRAM() ignored, delta time=%ld\r\n", m - last_lcd_flush_time);
   }
 }
 

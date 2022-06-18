@@ -126,7 +126,7 @@ void setup() {
   }
 
   init_power();
-  // init_rtc();
+  init_rtc();
   lcd_init();
 
   pinMode(BUTTON_HOME,  INPUT | PULLUP);
